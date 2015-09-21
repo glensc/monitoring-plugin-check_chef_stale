@@ -65,7 +65,7 @@ elsif wnodes.length > 0
 	puts "WARNING: " + wnodes.length.to_s + " nodes did not check in for " + warning.to_s + " hours: " + wnodes.join(', ')
 	exit(WARNING_STATE)
 elsif cnodes.length == 0 and wnodes.length == 0
-	puts "OK: All nodes are ok!"
+	puts "OK: All #{all_nodes.length} nodes checked in #{warning} hours"
 	exit(OK_STATE)
 else
 	puts "UNKNOWN"
