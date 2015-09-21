@@ -1,13 +1,26 @@
-#!/usr/bin/knife exec
-# vim:ft=ruby
-#
+#!/usr/bin/ruby
 # Based on: http://www.nclouds.com/alerting-for-stale-nodes-on-chef-with-nagios/
-# Rewritten by Elan Ruusamäe <glen@delfi.ee> to use knife exec
-# Date: 2014-11-10
+#
+# Rewritten by Elan Ruusamäe <glen@pld-linux.org>
+# https://github.com/glensc/nagios-plugin-check_chef_stale
+
+require 'optparse'
+require 'chef/client'
 
 # Define hours to be alerted upon and chef client.rb path so the script can execute knife status command
 critical = 12
 warning = 2
+
+OptionParser.new do |opts|
+	opts.banner = "Usage: check_chef_stale.rb [options]"
+
+	opts.on("-w", "--warning", "Set warning treshold in hours. Default: #{warning}h") do |v|
+		warning = v.to_i
+	end
+	opts.on("-c", "--critical", "Set critical treshold in hours. Default: #{critical}h") do |v|
+		critical = v.to_i
+	end
+end.parse!
 
 OK_STATE = 0
 WARNING_STATE = 1
@@ -23,7 +36,10 @@ all_nodes = []
 cnodes = []
 wnodes = []
 
-search('node', "ohai_time:*") do |node|
+Chef::Config.from_file(File.expand_path("/etc/chef/client.rb"))
+
+query = Chef::Search::Query.new
+query.search('node', "ohai_time:*") do |node|
 	all_nodes << node
 end
 
