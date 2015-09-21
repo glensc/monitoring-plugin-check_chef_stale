@@ -48,8 +48,9 @@ Chef::Search::Query.new.search('node', query) do |node|
 	all_nodes << node
 end
 
+now = Time.now.to_i
 all_nodes.each do |node|
-	hours = (Time.now.to_i - node['ohai_time'].to_i)/3600
+	hours = (now - node['ohai_time'].to_i)/3600
 	if hours >= critical
 		cnodes << node.name
 	elsif hours >= warning
