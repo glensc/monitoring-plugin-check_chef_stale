@@ -14,10 +14,10 @@ warning = 2
 OptionParser.new do |opts|
 	opts.banner = "Usage: check_chef_stale.rb [options]"
 
-	opts.on("-w", "--warning", "Set warning treshold in hours. Default: #{warning}h") do |v|
+	opts.on("-w", "--warning N", "Set warning treshold in hours. Default: #{warning}h") do |v|
 		warning = v.to_i
 	end
-	opts.on("-c", "--critical", "Set critical treshold in hours. Default: #{critical}h") do |v|
+	opts.on("-c", "--critical N", "Set critical treshold in hours. Default: #{critical}h") do |v|
 		critical = v.to_i
 	end
 end.parse!
