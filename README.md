@@ -17,22 +17,6 @@ define service {
 
 **NOTE**: the paths may vary, depending on your Nagios/Icinga installation.
 
-## Setting up chef ##
-
-You need additionally to configure `~/.chef/knife.rb` for user that runs the plugin (usually `nagios`):
-
-```ruby
-log_level                :debug
-log_location             STDOUT
-node_name                'glen'
-client_key               'glen.pem'
-validation_client_name   'glen'
-validation_key           '~/.chef/glen.pem'
-chef_server_url          'https://chef-server'
-```
-
-Consult [knife configure](https://docs.chef.io/knife_configure.html) manual for details.
-
 ## Known Issues ##
 
 ```
