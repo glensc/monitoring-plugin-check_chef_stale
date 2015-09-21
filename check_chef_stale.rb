@@ -7,9 +7,12 @@
 require 'optparse'
 require 'chef/client'
 
-# Define hours to be alerted upon and chef client.rb path so the script can execute knife status command
+# Setup some defaults
+# Hours to be alerted upon
 critical = 12
 warning = 2
+# Solr search query to make
+query = "ohai_time:*"
 
 OptionParser.new do |opts|
 	opts.banner = "Usage: check_chef_stale.rb [options]"
@@ -19,6 +22,9 @@ OptionParser.new do |opts|
 	end
 	opts.on("-c", "--critical N", "Set critical treshold in hours. Default: #{critical}h") do |v|
 		critical = v.to_i
+	end
+	opts.on("-q", "--query QUERY", "Append query to Chef-SOLR search") do |v|
+		query = "#{query} #{v}"
 	end
 end.parse!
 
@@ -38,8 +44,7 @@ wnodes = []
 
 Chef::Config.from_file(File.expand_path("/etc/chef/client.rb"))
 
-query = Chef::Search::Query.new
-query.search('node', "ohai_time:*") do |node|
+Chef::Search::Query.new.search('node', query) do |node|
 	all_nodes << node
 end
 
