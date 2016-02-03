@@ -59,10 +59,10 @@ all_nodes.each do |node|
 end
 
 if cnodes.length > 0
-	puts "CRITICAL: " + cnodes.length.to_s + " nodes did not check in for " + critical.to_s + " hours: " + cnodes.join(', ')
+	puts "CRITICAL: " + cnodes.length.to_s + " nodes did not check in for " + critical.to_s + " hours: " + cnodes.sort.join(', ')
 	exit(CRITICAL_STATE)
 elsif wnodes.length > 0
-	puts "WARNING: " + wnodes.length.to_s + " nodes did not check in for " + warning.to_s + " hours: " + wnodes.join(', ')
+	puts "WARNING: " + wnodes.length.to_s + " nodes did not check in for " + warning.to_s + " hours: " + wnodes.sort.join(', ')
 	exit(WARNING_STATE)
 elsif cnodes.length == 0 and wnodes.length == 0
 	puts "OK: All #{all_nodes.length} nodes checked in #{warning} hours"
