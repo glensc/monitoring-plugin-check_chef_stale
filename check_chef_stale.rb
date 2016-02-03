@@ -59,12 +59,12 @@ all_nodes.each do |node|
 end
 
 def report_fail_nodes(nodes, hours)
-	res = nodes.length.to_s + " nodes did not check in for " + hours.to_s + " hours: "
 	if nodes.length == 1
 		node = nodes[0]
 		time = Time.at(node['ohai_time']).strftime('%Y-%m-%d %H:%M:%S %z')
-		res += "#{node} checked in #{time}"
+		res = "#{node} did not check in for #{hours.to_s} hours (#{time})"
 	else
+		res = "#{nodes.length.to_s} nodes did not check in for #{hours.to_s} hours: "
 		res += nodes.map { |n| n.name }.sort.join(', ')
 	end
 	res
@@ -74,7 +74,7 @@ def report_ok_nodes(nodes, hours)
 	if nodes.length == 1
 		node = nodes[0]
 		time = Time.at(node['ohai_time']).strftime('%Y-%m-%d %H:%M:%S %z')
-		"The #{node} checked in #{hours} hours (#{time})"
+		"#{node} checked in #{hours} hours (#{time})"
 	else
 		"All #{nodes.length} nodes checked in #{hours} hours"
 	end
