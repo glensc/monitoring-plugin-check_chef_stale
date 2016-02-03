@@ -52,14 +52,22 @@ now = Time.now.to_i
 all_nodes.each do |node|
 	hours = (now - node['ohai_time'].to_i)/3600
 	if hours >= critical
-		cnodes << node.name
+		cnodes << node
 	elsif hours >= warning
-		wnodes << node.name
+		wnodes << node
 	end
 end
 
 def report_fail_nodes(nodes, hours)
-	nodes.length.to_s + " nodes did not check in for " + hours.to_s + " hours: " + nodes.sort.join(', ')
+	res = nodes.length.to_s + " nodes did not check in for " + hours.to_s + " hours: "
+	if nodes.length == 1
+		node = nodes[0]
+		time = Time.at(node['ohai_time']).strftime('%Y-%m-%d %H:%M:%S %z')
+		res += "#{node} checked in #{time}"
+	else
+		res += nodes.map { |n| n.name }.sort.join(', ')
+	end
+	res
 end
 
 def report_ok_nodes(nodes, hours)
