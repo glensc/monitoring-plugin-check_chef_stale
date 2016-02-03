@@ -29,3 +29,15 @@ ensure `node_name` is defined in chef config. If you use [chef-client](https://g
 # needed for check_chef_stale.rb
 Chef::Config[:node_name] = 'nagios.fqdn.example.org'
 ```
+
+----
+
+```
+[2016-02-03T13:49:00+02:00] WARN: Failed to read the private key /etc/chef/client.pem: #<Errno::EACCES: Permission denied - /etc/chef/client.pem>
+```
+
+ensure the files are accessible by user running the checks:
+```sh
+chmod a+r /etc/chef/client.d/nodename.rb
+chown nagios /etc/chef/client.pem
+```
