@@ -58,14 +58,28 @@ all_nodes.each do |node|
 	end
 end
 
+def report_fail_nodes(nodes, hours)
+	nodes.length.to_s + " nodes did not check in for " + hours.to_s + " hours: " + nodes.sort.join(', ')
+end
+
+def report_ok_nodes(nodes, hours)
+	if nodes.length == 1
+		node = nodes[0]
+		time = Time.at(node['ohai_time']).strftime('%Y-%m-%d %H:%M:%S %z')
+		"The #{node} checked in #{hours} hours (#{time})"
+	else
+		"All #{nodes.length} nodes checked in #{hours} hours"
+	end
+end
+
 if cnodes.length > 0
-	puts "CRITICAL: " + cnodes.length.to_s + " nodes did not check in for " + critical.to_s + " hours: " + cnodes.sort.join(', ')
+	puts "CRITICAL: " + report_fail_nodes(cnodes, critical)
 	exit(CRITICAL_STATE)
 elsif wnodes.length > 0
-	puts "WARNING: " + wnodes.length.to_s + " nodes did not check in for " + warning.to_s + " hours: " + wnodes.sort.join(', ')
+	puts "WARNING: " + report_fail_nodes(wnodes, warning)
 	exit(WARNING_STATE)
 elsif cnodes.length == 0 and wnodes.length == 0
-	puts "OK: All #{all_nodes.length} nodes checked in #{warning} hours"
+	puts "OK: "+ report_ok_nodes(all_nodes, warning)
 	exit(OK_STATE)
 else
 	puts "UNKNOWN"
