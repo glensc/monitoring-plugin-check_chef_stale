@@ -80,7 +80,10 @@ def report_ok_nodes(nodes, hours)
 	end
 end
 
-if cnodes.length > 0
+if all_nodes.length == 0
+	puts "CRITICAL: No nodes match criteria"
+	exit(CRITICAL_STATE)
+elsif cnodes.length > 0
 	puts "CRITICAL: " + report_fail_nodes(cnodes, critical)
 	exit(CRITICAL_STATE)
 elsif wnodes.length > 0
