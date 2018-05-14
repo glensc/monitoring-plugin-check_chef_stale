@@ -6,13 +6,14 @@
 
 require 'optparse'
 require 'chef/client'
-
 # Setup some defaults
 # Hours to be alerted upon
 critical = 12
 warning = 2
 # Solr search query to make
 query = "ohai_time:*"
+# Chef client.rb config files to use (can have multiple chef server configs)
+chef_clients = ['/etc/chef/client.rb']
 
 OptionParser.new do |opts|
 	opts.banner = "Usage: check_chef_stale.rb [options]"
@@ -39,17 +40,35 @@ if warning > critical || warning < 0
 end
 
 all_nodes = []
+unique_nodes = []
+repeating = {}
 cnodes = []
 wnodes = []
 
-Chef::Config.from_file(File.expand_path("/etc/chef/client.rb"))
-
-Chef::Search::Query.new.search('node', query) do |node|
-	all_nodes << node
+chef_clients.each do |client|
+	Chef::Config.from_file(File.expand_path(client))
+	Chef::Search::Query.new.search('node', query) do |node|
+		all_nodes << node
+	end
 end
 
 now = Time.now.to_i
+
 all_nodes.each do |node|
+	if repeating.include? node.name
+		if repeating[node.name][0] < node['ohai_time'].to_i
+			repeating.store(node.name, [node['ohai_time'].to_i, node])
+		end
+	else
+		repeating.store(node.name, [node['ohai_time'].to_i, node])
+	end
+end
+
+repeating.each do |nodename, node|
+	unique_nodes << node[1]
+end
+
+unique_nodes.each do |node|
 	hours = (now - node['ohai_time'].to_i)/3600
 	if hours >= critical
 		cnodes << node
@@ -80,7 +99,7 @@ def report_ok_nodes(nodes, hours)
 	end
 end
 
-if all_nodes.length == 0
+if unique_nodes.length == 0
 	puts "CRITICAL: No nodes match criteria"
 	exit(CRITICAL_STATE)
 elsif cnodes.length > 0
@@ -90,7 +109,7 @@ elsif wnodes.length > 0
 	puts "WARNING: " + report_fail_nodes(wnodes, warning)
 	exit(WARNING_STATE)
 elsif cnodes.length == 0 and wnodes.length == 0
-	puts "OK: "+ report_ok_nodes(all_nodes, warning)
+	puts "OK: "+ report_ok_nodes(unique_nodes, warning)
 	exit(OK_STATE)
 else
 	puts "UNKNOWN"
